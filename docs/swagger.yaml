@@ -1,0 +1,19 @@
+info:
+  contact: {}
+paths:
+  /users:
+    get:
+      consumes:
+      - application/json
+      description: list user info
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: list user info
+      tags:
+      - user
+swagger: "2.0"
