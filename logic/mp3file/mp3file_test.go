@@ -1,4 +1,4 @@
-package logic
+package mp3file
 
 import "testing"
 

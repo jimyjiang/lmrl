@@ -2,39 +2,41 @@ package cache
 
 import (
 	"encoding/json"
-	"lmrl/logic"
+	"lmrl/logic/types"
 	"sync"
 )
 
-var mp3Cache = &Mp3Cache{}
+var mp3Cache *Mp3Cache
 
 type FileName = string
 type Mp3Cache struct {
-	m map[FileName]*logic.Sermon
+	m map[FileName]*types.Sermon
 	sync.RWMutex
 }
 
 func GetMp3Cache() *Mp3Cache {
 	if mp3Cache == nil {
-		mp3Cache = &Mp3Cache{}
+		mp3Cache = &Mp3Cache{
+			m: map[FileName]*types.Sermon{},
+		}
 	}
 	return mp3Cache
 }
 
-func (cache *Mp3Cache) Get(fileName string) (*logic.Sermon, bool) {
+func (cache *Mp3Cache) Get(fileName string) (*types.Sermon, bool) {
 	cache.RLock()
 	defer cache.RUnlock()
 
 	s, ok := cache.m[fileName]
 	return s, ok
 }
-func (cache *Mp3Cache) Set(fileName string, sermon *logic.Sermon) {
+func (cache *Mp3Cache) Set(fileName string, sermon *types.Sermon) {
 	cache.Lock()
 	defer cache.Unlock()
 
 	cache.m[fileName] = sermon
 }
-func (cache *Mp3Cache) ReBuild(m map[FileName]*logic.Sermon) {
+func (cache *Mp3Cache) ReBuild(m map[FileName]*types.Sermon) {
 	cache.Lock()
 	defer cache.Unlock()
 

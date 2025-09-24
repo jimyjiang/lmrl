@@ -17,6 +17,7 @@ func main() {
 		panic(err)
 	}
 	jobs.RegisterDownloadMp3Job()
+	jobs.Start()
 	ro := []xgin.Option{
 		xgin.WithHost(""),
 		xgin.WithPort(3001),

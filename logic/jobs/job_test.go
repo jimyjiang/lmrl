@@ -2,8 +2,8 @@ package jobs
 
 import (
 	"fmt"
-	"lmrl/logic"
 	"lmrl/logic/cache"
+	"lmrl/logic/types"
 	"testing"
 	"time"
 
@@ -11,7 +11,7 @@ import (
 )
 
 func SetupTest() {
-	logic.MP3_DIR = "testdata/mp3files"
+	types.MP3_DIR = "testdata/mp3files"
 }
 func TestRunDownloadMp3Job(t *testing.T) {
 	SetupTest()

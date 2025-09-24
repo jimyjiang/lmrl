@@ -2,8 +2,9 @@ package api
 
 import (
 	"fmt"
-	"lmrl/logic"
 	"lmrl/logic/cache"
+	"lmrl/logic/mp3file"
+	"lmrl/logic/types"
 	"os"
 	"path/filepath"
 	"sort"
@@ -12,8 +13,8 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func GetSermonsFromDir(dirPath string) ([]*logic.Sermon, error) {
-	var sermons []*logic.Sermon
+func GetSermonsFromDir(dirPath string) ([]*types.Sermon, error) {
+	var sermons []*types.Sermon
 
 	mp3Cache := cache.GetMp3Cache()
 
@@ -34,7 +35,7 @@ func GetSermonsFromDir(dirPath string) ([]*logic.Sermon, error) {
 			sermons = append(sermons, cachedSermon)
 			continue
 		}
-		sermon, err := logic.ParseMP3File(filePath)
+		sermon, err := mp3file.ParseMP3File(filePath)
 		if err != nil {
 			fmt.Printf("解析文件 %s 失败: %v\n", entry.Name(), err)
 			continue
@@ -53,7 +54,7 @@ func GetSermonsFromDir(dirPath string) ([]*logic.Sermon, error) {
 }
 
 func LMRL(c *gin.Context) {
-	list, err := GetSermonsFromDir(logic.MP3_DIR)
+	list, err := GetSermonsFromDir(types.MP3_DIR)
 	// list, err := GetSermonsFromDir("/Users/jimmy.jiang/doc/基督/灵命日粮/202509")
 	if err != nil {
 		c.JSON(500, gin.H{

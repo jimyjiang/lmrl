@@ -3,8 +3,9 @@ package jobs
 import (
 	"fmt"
 	"io"
-	"lmrl/logic"
 	"lmrl/logic/cache"
+	"lmrl/logic/mp3file"
+	"lmrl/logic/types"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -37,7 +38,7 @@ func RegisterDownloadMp3Job() {
 	// }
 	Init()
 	// 添加定时任务：每天8点到16点每小时执行一次（8,9,10,...,16）
-	_, err := scheduler.AddFunc("0 8-16 * * *", func() {
+	_, err := scheduler.AddFunc("18 8-16 * * *", func() {
 		fmt.Printf("执行时间: %v\n", time.Now())
 		if err := RunDownloadMp3Job(time.Now()); err != nil {
 			fmt.Printf("任务执行失败: %v\n", err)
@@ -53,7 +54,7 @@ func RegisterDownloadMp3Job() {
 // RunDownloadMp3Job 执行检查下载任务
 func RunDownloadMp3Job(t time.Time) error {
 	fileName := generateFileName(t)
-	filePath := filepath.Join(logic.MP3_DIR, fileName)
+	filePath := filepath.Join(types.MP3_DIR, fileName)
 
 	// 检查文件是否已存在
 	if _, err := os.Stat(filePath); err == nil {
@@ -99,7 +100,7 @@ func downloadFile(fileName string) error {
 		return fmt.Errorf("HTTP请求失败: %s", resp.Status)
 	}
 
-	filePath := filepath.Join(logic.MP3_DIR, fileName)
+	filePath := filepath.Join(types.MP3_DIR, fileName)
 	out, err := os.Create(filePath)
 	if err != nil {
 		return err
@@ -112,7 +113,7 @@ func downloadFile(fileName string) error {
 
 // cleanupOldFiles 清理旧文件，保留最新的maxFiles个文件
 func cleanupOldFiles() error {
-	files, err := filepath.Glob(filepath.Join(logic.MP3_DIR, filePrefix+"*"+fileExt))
+	files, err := filepath.Glob(filepath.Join(types.MP3_DIR, filePrefix+"*"+fileExt))
 	if err != nil {
 		return err
 	}
@@ -135,10 +136,10 @@ func cleanupOldFiles() error {
 	return nil
 }
 func rebuildMp3Cache() error {
-	m := map[cache.FileName]*logic.Sermon{}
+	m := map[cache.FileName]*types.Sermon{}
 
 	// 读取目录
-	entries, err := os.ReadDir(logic.MP3_DIR)
+	entries, err := os.ReadDir(types.MP3_DIR)
 	if err != nil {
 		return fmt.Errorf("读取目录失败: %v", err)
 	}
@@ -149,11 +150,11 @@ func rebuildMp3Cache() error {
 			continue
 		}
 
-		filePath := filepath.Join(logic.MP3_DIR, entry.Name())
+		filePath := filepath.Join(types.MP3_DIR, entry.Name())
 		if _, ok := m[filePath]; ok {
 			continue
 		}
-		sermon, err := logic.ParseMP3File(filePath)
+		sermon, err := mp3file.ParseMP3File(filePath)
 		if err != nil {
 			fmt.Printf("解析文件 %s 失败: %v\n", entry.Name(), err)
 			continue

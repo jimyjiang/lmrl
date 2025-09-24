@@ -37,6 +37,36 @@
         transition: all 0.3s ease;
       }
     }
+    /* 自定义进度条样式 */
+#progressBar::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #E67E22;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#progressBar::-webkit-slider-thumb:hover {
+  transform: scale(1.2);
+  background: #D35400;
+}
+
+#progressBar::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  background: #E67E22;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+#progressBar::-moz-range-thumb:hover {
+  transform: scale(1.2);
+  background: #D35400;
+}
   </style>
 </head>
 <body class="bg-gray-50 font-sans text-gray-800 min-h-screen">
@@ -89,7 +119,7 @@
       {{range .SermonList}}
       <div class="p-4 hover:bg-gray-50 transition-custom flex flex-col md:flex-row md:items-center justify-between">
         <div class="flex-1 min-w-0">
-          <a href="/灵命日粮/{{.Filename}}"  target="_blank" class="text-primary hover:text-secondary transition-custom font-medium flex items-center">
+          <a href="/灵命日粮/{{.Filename}}" class="text-primary hover:text-secondary transition-custom font-medium flex items-center">
             <i class="fa fa-angle-right text-primary/70 mr-2"></i>
             <span class="truncate">{{.Title}}</span>
           </a>
@@ -113,7 +143,163 @@
       {{end}}
       </div>
     </section>
+<!-- 音频播放弹出层 -->
+<div id="audioPlayerModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black bg-opacity-70">
+  <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-md mx-4 overflow-hidden">
+    <!-- 关闭按钮 -->
+    <button id="closePlayer" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors">
+      <i class="fa fa-times text-2xl"></i>
+    </button>
+    
+    <!-- 播放器主体 -->
+    <div class="p-6">
+      <!-- 音频信息 -->
+      <div class="flex items-center mb-6">
+        <div class="bg-primary/10 p-3 rounded-lg mr-4">
+          <i class="fa fa-music text-primary text-2xl"></i>
+        </div>
+        <div>
+          <h3 id="audioTitle" class="font-semibold text-lg text-gray-800 truncate max-w-[250px]">讲道标题</h3>
+          <p id="audioSpeaker" class="text-gray-500 text-sm">孙大中</p>
+        </div>
+      </div>
+      
+      <!-- 音频控制 -->
+      <audio id="modalAudioPlayer" class="w-full"></audio>
+      
+      <!-- 自定义控制条 -->
+      <div class="mt-4 space-y-3">
+        <!-- 进度条 -->
+        <div class="flex items-center space-x-3">
+          <span id="currentTime" class="text-xs text-gray-500 w-10">0:00</span>
+          <input type="range" id="progressBar" class="flex-1 h-2 bg-gray-200 rounded-full appearance-none cursor-pointer" min="0" max="100" value="0">
+          <span id="duration" class="text-xs text-gray-500 w-10">0:00</span>
+        </div>
+        
+        <!-- 控制按钮 -->
+        <div class="flex justify-center items-center space-x-6">
+          <button id="rewindBtn" class="text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-step-backward text-xl"></i>
+          </button>
+          <button id="playPauseBtn" class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-secondary transition-colors">
+            <i class="fa fa-play text-xl"></i>
+          </button>
+          <button id="forwardBtn" class="text-gray-600 hover:text-primary transition-colors">
+            <i class="fa fa-step-forward text-xl"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
   </main>
+<script lang="javascript">
+  // 获取DOM元素
+const audioPlayerModal = document.getElementById('audioPlayerModal');
+const modalAudioPlayer = document.getElementById('modalAudioPlayer');
+const closePlayer = document.getElementById('closePlayer');
+const playPauseBtn = document.getElementById('playPauseBtn');
+const progressBar = document.getElementById('progressBar');
+const currentTimeEl = document.getElementById('currentTime');
+const durationEl = document.getElementById('duration');
+const audioTitle = document.getElementById('audioTitle');
+const audioSpeaker = document.getElementById('audioSpeaker');
 
+// 初始化播放器状态
+let isPlaying = false;
+
+// 为所有音频链接添加点击事件
+document.querySelectorAll('a[href$=".mp3"]').forEach(link => {
+  link.addEventListener('click', function(e) {
+    e.preventDefault(); // 阻止默认跳转
+    
+    // 设置音频信息
+    const title = this.dataset.title || this.textContent.trim();
+    const speaker = this.dataset.speaker || "孙大中";
+    
+    audioTitle.textContent = title;
+    audioSpeaker.textContent = speaker;
+    
+    // 设置音频源
+    modalAudioPlayer.src = this.href;
+    
+    // 显示弹出层
+    audioPlayerModal.classList.remove('hidden');
+    audioPlayerModal.classList.add('flex');
+    
+    // 自动播放（注意：浏览器可能会阻止自动播放）
+    modalAudioPlayer.play().then(() => {
+      isPlaying = true;
+      playPauseBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+    }).catch(error => {
+      console.log("自动播放被阻止:", error);
+    });
+  });
+});
+
+// 关闭播放器
+closePlayer.addEventListener('click', () => {
+  audioPlayerModal.classList.add('hidden');
+  audioPlayerModal.classList.remove('flex');
+  modalAudioPlayer.pause();
+  isPlaying = false;
+});
+
+// 播放/暂停控制
+playPauseBtn.addEventListener('click', () => {
+  if (isPlaying) {
+    modalAudioPlayer.pause();
+    playPauseBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+  } else {
+    modalAudioPlayer.play();
+    playPauseBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+  }
+  isPlaying = !isPlaying;
+});
+
+// 进度条更新
+modalAudioPlayer.addEventListener('timeupdate', () => {
+  const currentTime = modalAudioPlayer.currentTime;
+  const duration = modalAudioPlayer.duration;
+  
+  // 更新进度条
+  if (!isNaN(duration)) {
+    const progressPercent = (currentTime / duration) * 100;
+    progressBar.value = progressPercent;
+    
+    // 更新时间显示
+    currentTimeEl.textContent = formatTime(currentTime);
+    durationEl.textContent = formatTime(duration);
+  }
+});
+
+// 拖动进度条
+progressBar.addEventListener('input', () => {
+  const seekTime = (progressBar.value / 100) * modalAudioPlayer.duration;
+  modalAudioPlayer.currentTime = seekTime;
+});
+
+// 音频结束处理
+modalAudioPlayer.addEventListener('ended', () => {
+  isPlaying = false;
+  playPauseBtn.innerHTML = '<i class="fa fa-play text-xl"></i>';
+});
+
+// 快进/快退按钮
+document.getElementById('rewindBtn').addEventListener('click', () => {
+  modalAudioPlayer.currentTime = Math.max(0, modalAudioPlayer.currentTime - 15);
+});
+
+document.getElementById('forwardBtn').addEventListener('click', () => {
+  modalAudioPlayer.currentTime = Math.min(modalAudioPlayer.duration, modalAudioPlayer.currentTime + 15);
+});
+
+// 格式化时间显示 (秒 → MM:SS)
+function formatTime(seconds) {
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+</script>
 </body>
 </html>

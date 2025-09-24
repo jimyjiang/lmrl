@@ -1,7 +1,8 @@
-package logic
+package mp3file
 
 import (
 	"fmt"
+	"lmrl/logic/types"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -12,7 +13,7 @@ import (
 	"github.com/hajimehoshi/go-mp3"
 )
 
-func ParseMP3File(filePath string) (*Sermon, error) {
+func ParseMP3File(filePath string) (*types.Sermon, error) {
 	// 获取文件基本信息（大小、修改时间等）
 	fileInfo, err := os.Stat(filePath)
 	if err != nil {
@@ -68,7 +69,7 @@ func ParseMP3File(filePath string) (*Sermon, error) {
 	}
 
 	// 4. 构建Sermon对象（讲员固定为"孙大中"，因节目特性）
-	return &Sermon{
+	return &types.Sermon{
 		Filename: fileName,              // 文件名（如：mw250910.mp3）
 		Title:    mainTitle,             // 讲道主题（如："对潜能的衡量在于神的同在与应许"）
 		Date:     dateStr,               // 日期（如：2025-09-10）
@@ -93,10 +94,10 @@ func formatFileSize(size int64) string {
 }
 
 // fallbackParse 元数据读取失败时的回退解析
-func fallbackParse(filePath string, fileInfo os.FileInfo) *Sermon {
+func fallbackParse(filePath string, fileInfo os.FileInfo) *types.Sermon {
 	fileName := filepath.Base(filePath)
 	baseName := strings.TrimSuffix(fileName, filepath.Ext(fileName))
-	return &Sermon{
+	return &types.Sermon{
 		Filename: fileName,
 		Title:    baseName,
 		Date:     fileInfo.ModTime().Format("2006-01-02"),

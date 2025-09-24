@@ -1,4 +1,4 @@
-package logic
+package types
 
 type Sermon struct {
 	Filename string // 文件名
