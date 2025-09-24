@@ -4,9 +4,11 @@ import (
 	"log"
 	"os"
 
+	"lmrl/logic/jobs"
+	"lmrl/router"
+
 	"awesome.go/xcmd/xgin"
 	"go.opentelemetry.io/contrib/instrumentation/github.com/gin-gonic/gin/otelgin"
-	"lmrl/router"
 )
 
 func main() {
@@ -14,6 +16,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	jobs.RegisterDownloadMp3Job()
 	ro := []xgin.Option{
 		xgin.WithHost(""),
 		xgin.WithPort(3001),

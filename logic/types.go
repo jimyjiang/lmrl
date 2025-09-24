@@ -8,3 +8,7 @@ type Sermon struct {
 	Duration string // 时长，如"45分钟"
 	FileSize string // 文件大小，如"12MB"
 }
+
+var (
+	MP3_DIR = "/root/web/灵命日粮"
+)

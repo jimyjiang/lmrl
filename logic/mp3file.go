@@ -37,11 +37,11 @@ func ParseMP3File(filePath string) (*Sermon, error) {
 
 	// 1. 提取日期（优先级：标题 > 文件名 > 文件修改时间）
 	dateStr := ""
-	fmt.Printf("Title:%s\n", meta.Title())
+	// fmt.Printf("Title:%s\n", meta.Title())
 	// 从标题提取（如："旷野吗哪-20250910" → 2025-09-10）
 	if titleDate := extractDateFromTitle(meta.Title()); titleDate != "" {
 		dateStr = titleDate
-		fmt.Printf("TitleDate:%s\n", dateStr)
+		// fmt.Printf("TitleDate:%s\n", dateStr)
 	} else if fileNameDate := extractDateFromFileName(fileName); fileNameDate != "" {
 		// 从文件名提取（如："mw250910.mp3" → 2025-09-10）
 		dateStr = fileNameDate
@@ -53,10 +53,10 @@ func ParseMP3File(filePath string) (*Sermon, error) {
 	// 2. 提取讲道主题（优先级：注释 > 标题 > 文件名）
 	mainTitle := ""
 	// 从注释提取（如："对潜能的衡量在于神的同在与应许 (士师记6:11-18)" → 提取主题）
-	fmt.Printf("Comment:%s\n", meta.Comment())
+	// fmt.Printf("Comment:%s\n", meta.Comment())
 	if comment := meta.Comment(); comment != "" {
 		mainTitle = extractMainTitle(comment)
-		fmt.Printf("MainTitle:%s\n", mainTitle)
+		// fmt.Printf("MainTitle:%s\n", mainTitle)
 	}
 	// 从标题提取（清理前缀和日期）
 	if mainTitle == "" && meta.Title() != "" {
