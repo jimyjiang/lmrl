@@ -10,7 +10,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
 )
 
@@ -31,11 +30,6 @@ func init() {
 }
 
 func RegisterDownloadMp3Job() {
-	// 创建目录(如果不存在)
-	// if err := os.MkdirAll(MP3_Files, 0755); err != nil {
-	// 	fmt.Printf("创建目录失败: %v\n", err)
-	// 	return
-	// }
 	Init()
 	// 添加定时任务：每天8点到16点每小时执行一次（8,9,10,...,16）
 	_, err := scheduler.AddFunc("18 8-16 * * *", func() {
@@ -136,31 +130,10 @@ func cleanupOldFiles() error {
 	return nil
 }
 func rebuildMp3Cache() error {
-	m := map[cache.FileName]*types.Sermon{}
-
-	// 读取目录
-	entries, err := os.ReadDir(types.MP3_DIR)
+	mapSermons, err := mp3file.GetSermonsFromDir(types.MP3_DIR, false)
 	if err != nil {
-		return fmt.Errorf("读取目录失败: %v", err)
+		return err
 	}
-
-	// 收集MP3文件信息
-	for _, entry := range entries {
-		if entry.IsDir() || !strings.HasSuffix(strings.ToLower(entry.Name()), ".mp3") {
-			continue
-		}
-
-		filePath := filepath.Join(types.MP3_DIR, entry.Name())
-		if _, ok := m[filePath]; ok {
-			continue
-		}
-		sermon, err := mp3file.ParseMP3File(filePath)
-		if err != nil {
-			fmt.Printf("解析文件 %s 失败: %v\n", entry.Name(), err)
-			continue
-		}
-		m[filePath] = sermon
-	}
-	cache.GetMp3Cache().ReBuild(m)
+	cache.GetMp3Cache().ReBuild(mapSermons)
 	return nil
 }

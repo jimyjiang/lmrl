@@ -1,5 +1,6 @@
 package types
 
+type FileName = string
 type Sermon struct {
 	Filename string // 文件名
 	Title    string // 讲道主题

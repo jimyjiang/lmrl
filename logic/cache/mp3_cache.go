@@ -8,16 +8,15 @@ import (
 
 var mp3Cache *Mp3Cache
 
-type FileName = string
 type Mp3Cache struct {
-	m map[FileName]*types.Sermon
+	m map[types.FileName]*types.Sermon
 	sync.RWMutex
 }
 
 func GetMp3Cache() *Mp3Cache {
 	if mp3Cache == nil {
 		mp3Cache = &Mp3Cache{
-			m: map[FileName]*types.Sermon{},
+			m: map[types.FileName]*types.Sermon{},
 		}
 	}
 	return mp3Cache
@@ -36,7 +35,7 @@ func (cache *Mp3Cache) Set(fileName string, sermon *types.Sermon) {
 
 	cache.m[fileName] = sermon
 }
-func (cache *Mp3Cache) ReBuild(m map[FileName]*types.Sermon) {
+func (cache *Mp3Cache) ReBuild(m map[types.FileName]*types.Sermon) {
 	cache.Lock()
 	defer cache.Unlock()
 
