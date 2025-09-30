@@ -10,8 +10,19 @@ import (
 	"sync"
 )
 
-func GetSermonsFromDir(dirPath string, setCache bool) (map[types.FileName]*types.Sermon, error) {
+var ch = make(chan func(), 100)
 
+func worker() {
+	for f := range ch {
+		f()
+	}
+}
+func init() {
+	for i := 0; i < 4; i++ {
+		go worker()
+	}
+}
+func GetSermonsFromDir(dirPath string, setCache bool) (map[types.FileName]*types.Sermon, error) {
 	mp3Cache := cache.GetMp3Cache()
 	// 读取目录
 	entries, err := os.ReadDir(dirPath)
@@ -29,26 +40,27 @@ func GetSermonsFromDir(dirPath string, setCache bool) (map[types.FileName]*types
 	wg.Add(len(entries))
 	// 收集MP3文件信息
 	for _, entry := range entries {
-		go func(entry os.DirEntry) {
-			defer wg.Done()
-			if entry.IsDir() || !strings.HasSuffix(strings.ToLower(entry.Name()), ".mp3") {
-				return
+		ch <- func(entry os.DirEntry) func() {
+			return func() {
+				defer wg.Done()
+				if entry.IsDir() || !strings.HasSuffix(strings.ToLower(entry.Name()), ".mp3") {
+					return
+				}
+				filePath := filepath.Join(dirPath, entry.Name())
+				if cachedSermon, ok := mp3Cache.Get(filePath); ok {
+					setMap(filePath, cachedSermon)
+					return
+				}
+				sermon, err := ParseMP3File(filePath)
+				if err != nil {
+					fmt.Printf("解析文件 %s 失败: %v\n", entry.Name(), err)
+					return
+				}
+				if setCache {
+					mp3Cache.Set(filePath, sermon)
+				}
+				setMap(filePath, sermon)
 			}
-			filePath := filepath.Join(dirPath, entry.Name())
-			if cachedSermon, ok := mp3Cache.Get(filePath); ok {
-				setMap(filePath, cachedSermon)
-				return
-			}
-			sermon, err := ParseMP3File(filePath)
-			if err != nil {
-				fmt.Printf("解析文件 %s 失败: %v\n", entry.Name(), err)
-				return
-			}
-			if setCache {
-				mp3Cache.Set(filePath, sermon)
-			}
-			setMap(filePath, sermon)
-
 		}(entry)
 	}
 	wg.Wait()
