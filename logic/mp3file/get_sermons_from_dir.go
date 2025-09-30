@@ -1,6 +1,7 @@
 package mp3file
 
 import (
+	"context"
 	"fmt"
 	"lmrl/logic/cache"
 	"lmrl/logic/types"
@@ -12,14 +13,19 @@ import (
 
 var ch = make(chan func(), 100)
 
-func worker() {
-	for f := range ch {
-		f()
+func worker(ctx context.Context) {
+	for {
+		select {
+		case f := <-ch:
+			f()
+		case <-ctx.Done():
+			return
+		}
 	}
 }
-func init() {
+func StartWorker(ctx context.Context) {
 	for i := 0; i < 4; i++ {
-		go worker()
+		go worker(ctx)
 	}
 }
 func GetSermonsFromDir(dirPath string, setCache bool) (map[types.FileName]*types.Sermon, error) {

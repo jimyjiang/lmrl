@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"os/signal"
 
 	"lmrl/logic/jobs"
+	"lmrl/logic/mp3file"
 	"lmrl/router"
 
 	"awesome.go/xcmd/xgin"
@@ -16,6 +19,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer func() {
+		stop()
+	}()
+	mp3file.StartWorker(ctx)
 	jobs.RegisterDownloadMp3Job()
 	jobs.Start()
 	ro := []xgin.Option{

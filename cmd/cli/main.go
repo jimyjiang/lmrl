@@ -1,11 +1,13 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"lmrl/logic/mp3file"
 	"lmrl/logic/types"
 	"log"
 	"os"
+	"os/signal"
 	"path"
 	"sort"
 	"strings"
@@ -16,6 +18,11 @@ const (
 )
 
 func main() {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer func() {
+		stop()
+	}()
+	mp3file.StartWorker(ctx)
 	mapSermons, err := mp3file.GetSermonsFromDir(MP3_DIR, false)
 	if err != nil {
 		log.Fatalf("get sermons from dir error: %v", err)
