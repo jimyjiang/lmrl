@@ -42,7 +42,7 @@ func RegisterDownloadMp3Job() {
 		fmt.Printf("创建定时任务失败: %v\n", err)
 		return
 	}
-	fmt.Println("定时任务已注册，将在每天8点到16点每小时执行一次")
+	fmt.Println("定时任务已注册，将在每天5点到10点每小时执行一次")
 }
 
 // RunDownloadMp3Job 执行检查下载任务
