@@ -31,8 +31,8 @@ func init() {
 
 func RegisterDownloadMp3Job() {
 	Init()
-	// 添加定时任务：每天8点到16点每小时执行一次（8,9,10,...,16）
-	_, err := scheduler.AddFunc("18 8-16 * * *", func() {
+	// 添加定时任务：每天5点到10点每小时执行一次（5,6,7,...,10）
+	_, err := scheduler.AddFunc("0 5-10 * * *", func() {
 		fmt.Printf("执行时间: %v\n", time.Now())
 		if err := RunDownloadMp3Job(time.Now()); err != nil {
 			fmt.Printf("任务执行失败: %v\n", err)
