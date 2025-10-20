@@ -1,13 +1,13 @@
-build:
-	cd frontend && npm run build
+fbuild:
+	cd frontend && npm install && npm run build
+build: fbuild
 	GOOS=linux GOARCH=amd64 go build -o ./bin  ./...
 deploy: build
 	ssh git-server "/root/deploy/lmrl/run.sh stop"
 	scp ./bin/lmrl git-server:/root/deploy/lmrl/
 	scp ./scripts/run.sh git-server:/root/deploy/lmrl/
 	ssh git-server "/root/deploy/lmrl/run.sh start"
-install:
-	cd frontend && npm run build
+install: fbuild
 	go install ./...
 restart:
 	ssh git-server "/root/deploy/lmrl/run.sh restart"
