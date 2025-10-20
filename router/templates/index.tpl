@@ -189,6 +189,27 @@
           </button>
         </div>
       </div>
+      <div class="mt-6">
+        <h4 class="text-sm font-medium text-gray-700 mb-2">快速跳转</h4>
+        <div class="flex flex-wrap gap-2">
+          <!-- 示例时间点 -->
+          <button onclick="jumpToTime(60)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors">
+            1:00 - 引言
+          </button>
+          <button onclick="jumpToTime(135)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors">
+            2:15 - 诗歌
+          </button>
+          <button onclick="jumpToTime(320)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors">
+            5:20 - 读经
+          </button>
+          <button onclick="jumpToTime(440)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors">
+            7:20 - 经文讲解
+          </button>
+          <button onclick="jumpToTime(1640)" class="px-3 py-1 bg-gray-100 hover:bg-gray-200 rounded-full text-sm transition-colors">
+            27:20 - 祷告
+          </button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -293,6 +314,19 @@ document.getElementById('rewindBtn').addEventListener('click', () => {
 document.getElementById('forwardBtn').addEventListener('click', () => {
   modalAudioPlayer.currentTime = Math.min(modalAudioPlayer.duration, modalAudioPlayer.currentTime + 15);
 });
+
+// 跳转到指定时间(秒)
+function jumpToTime(seconds) {
+  const audio = document.getElementById('modalAudioPlayer');
+  audio.currentTime = seconds;
+  
+  // 视觉反馈
+  const button = event.target;
+  button.classList.add('bg-primary', 'text-white');
+  setTimeout(() => {
+    button.classList.remove('bg-primary', 'text-white');
+  }, 1000);
+}
 
 // 格式化时间显示 (秒 → MM:SS)
 function formatTime(seconds) {

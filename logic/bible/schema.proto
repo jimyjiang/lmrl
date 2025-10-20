@@ -1,0 +1,23 @@
+syntax = "proto3";
+option go_package="login/bible";
+message Verse {
+  string book_abbr = 1;
+  int32 chapter = 2;
+  int32 verse = 3;
+  string text = 4;
+}
+
+message Book {
+  string name = 1;
+  string abbreviation = 2;
+  repeated Chapter chapters = 3;
+}
+
+message Chapter {
+  repeated string verses = 1;
+}
+
+
+message BibleData {
+  repeated Book books = 1;
+}
