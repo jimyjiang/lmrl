@@ -114,7 +114,7 @@ func FullTextSearch(bible *BibleData, query string) []*SearchResult {
 
 		// 遍历所有章节
 		for chapterIdx, chapter := range book.GetChapters() {
-			chapterNum := chapterIdx + 1
+			chapterNum := chapterIdx
 
 			// 遍历所有经文
 			for verseIdx, verse := range chapter.GetVerses() {

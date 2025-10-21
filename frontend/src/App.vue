@@ -22,18 +22,45 @@ export default {
 
 <style>
 #app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  max-width: 800px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    "Noto Sans SC", sans-serif;
+  max-width: 680px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 16px;
+  text-align: left;
 }
 
 header {
-  text-align: center;
-  margin-bottom: 30px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid #e0e0e0;
 }
 
 header h1 {
-  color: #2c3e50;
+  color: #202124;
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+main {
+  padding: 0 8px;
+}
+
+/* 响应式调整 */
+@media (max-width: 600px) {
+  #app {
+    padding: 12px;
+  }
+
+  header {
+    margin-bottom: 16px;
+  }
+
+  header h1 {
+    font-size: 1.3rem;
+  }
 }
 </style>

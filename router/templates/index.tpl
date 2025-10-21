@@ -10,7 +10,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>《旷野吗哪》灵修信息</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+  <!-- <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
+  <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {
@@ -122,7 +123,12 @@
           <a href="/灵命日粮/{{.Filename}}" class="text-primary hover:text-secondary transition-custom font-medium flex items-center">
             <i class="fa fa-angle-right text-primary/70 mr-2"></i>
             <span class="truncate">{{.Title}}</span>
+            <button onclick="copyToClipboard(event, '{{.Title}}', this)" class="ml-2 text-gray-500 hover:text-gray-700" title="复制标题">
+              <i class="fa fa-copy"></i>
+            </button>
+            <span id="copyFeedback" class="hidden text-sm text-green-500 ml-2">已复制!</span>
           </a>
+          
           <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
             <span class="flex items-center">
               <i class="fa fa-user text-gray-400 mr-1"></i>{{.Speaker}}
@@ -333,6 +339,57 @@ function formatTime(seconds) {
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+}
+
+function copyToClipboard(event, text, button) {
+    // 方法1：尝试使用现代API
+    if (navigator.clipboard) {
+        navigator.clipboard.writeText(text).then(function() {
+            showFeedback(button);
+            event.preventDefault(); // 阻止默认行为
+            event.stopPropagation(); // 阻止冒泡
+        }).catch(function(err) {
+            fallbackCopy(text, button);
+            event.preventDefault(); // 阻止默认行为
+            event.stopPropagation(); // 阻止冒泡
+        });
+    } 
+    // 方法2：使用老式方法作为后备
+    else {
+        fallbackCopy(text, button);
+        event.preventDefault(); // 阻止默认行为
+        event.stopPropagation(); // 阻止冒泡
+    }
+}
+
+function fallbackCopy(text, button) {
+    // 创建临时textarea元素
+    const textarea = document.createElement('textarea');
+    textarea.value = text;
+    textarea.style.position = 'fixed';  // 避免滚动到底部
+    document.body.appendChild(textarea);
+    textarea.select();
+    
+    try {
+        // 尝试执行复制命令
+        const successful = document.execCommand('copy');
+        if (successful) {
+            showFeedback(button);
+        } else {
+            console.error('复制失败');
+        }
+    } catch (err) {
+        console.error('复制失败:', err);
+    }
+    
+    // 移除临时元素
+    document.body.removeChild(textarea);
+}
+
+function showFeedback(button) {
+    const feedback = button.nextElementSibling;
+    feedback.classList.remove('hidden');
+    setTimeout(() => feedback.classList.add('hidden'), 2000);
 }
 </script>
 </body>

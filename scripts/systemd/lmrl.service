@@ -1,0 +1,12 @@
+[Unit]
+Description=灵命日粮
+After=network.target
+
+[Service]
+ExecStart=/root/deploy/lmrl/lmrl
+WorkingDirectory=/root/deploy/lmrl
+Restart=on-failure
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
