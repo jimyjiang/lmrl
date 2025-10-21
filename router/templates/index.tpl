@@ -10,6 +10,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>《旷野吗哪》灵修信息</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script src="assets/javascript/tailwindcss-3.4.17.js"></script>
   <!-- <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
   <link href="assets/css/font-awesome.min.css" rel="stylesheet">
   <script>
