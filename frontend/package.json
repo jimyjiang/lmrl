@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "postbuild": "cp -r src/assets/css ../router/frontend/assets && cp -r src/assets/fonts ../router/frontend/assets",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -11,7 +11,7 @@
   <title>《旷野吗哪》灵修信息</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet"> -->
-  <link href="/assets/css/font-awesome.min.css" rel="stylesheet">
+  <link href="assets/css/font-awesome.min.css" rel="stylesheet">
   <script>
     tailwind.config = {
       theme: {

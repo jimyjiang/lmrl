@@ -10,6 +10,6 @@ type Sermon struct {
 	FileSize string // 文件大小，如"12MB"
 }
 
-var (
-	MP3_DIR = "/root/web/灵命日粮"
-)
+// var (
+// 	MP3_DIR = "/root/web/灵命日粮"
+// )
