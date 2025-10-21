@@ -5,10 +5,15 @@ fbuild:
 	cd frontend && npm install && npm run build
 
 build: fbuild
-	GOOS=linux GOARCH=amd64 go build -o ./bin  ./...
+	# GOOS=linux,darwin GOARCH=amd64 go build -o ./bin  ./...
+	./scripts/build.sh
+
+dev: fbuild
+	go build -o ./bin  ./...
+	./bin/lmrl
 
 deploy: build
-	scp ./bin/lmrl git-server:/root/deploy/lmrl/lmrl.new
+	scp ./bin/linux_amd64/lmrl git-server:/root/deploy/lmrl/lmrl.new
 	ssh git-server "mv -f /root/deploy/lmrl/lmrl.new /root/deploy/lmrl/lmrl && systemctl  restart lmrl.service"
 
 install: fbuild
@@ -22,7 +27,7 @@ stop:
 
 status:
 	ssh git-server "systemctl status lmrl"
-	
+
 restart:
 	ssh git-server "systemctl  restart lmrl"
 log:
