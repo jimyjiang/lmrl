@@ -128,7 +128,28 @@ func ParseBibleVerses(input string) []BibelVerse {
 			push(bookAbbr, chapterNum, startVerseNum, endVerseNum)
 			continue
 		}
+		// 处理 "4:1-5:3"
+		re = regexp.MustCompile(`^(\d+):(\d+)-(\d+):(\d+)$`)
+		match = re.FindStringSubmatch(segment)
+		if match != nil {
+			chapterNum, _ = strconv.Atoi(match[1])
+			startVerseNum, _ = strconv.Atoi(match[2])
+			endVerseNum = -1
+			push(bookAbbr, chapterNum, startVerseNum, endVerseNum)
 
+			chapterNumMin := chapterNum + 1
+			chapterNumMax, _ := strconv.Atoi(match[3])
+			for chapterNum = chapterNumMin; chapterNum < chapterNumMax; chapterNum++ {
+				startVerseNum = 1
+				endVerseNum = -1
+				push(bookAbbr, chapterNum, startVerseNum, endVerseNum)
+			}
+			chapterNum = chapterNumMax
+			startVerseNum = 1
+			endVerseNum, _ = strconv.Atoi(match[4])
+			push(bookAbbr, chapterNum, startVerseNum, endVerseNum)
+			continue
+		}
 		// 处理 "3:1-2"
 		re = regexp.MustCompile(`^(\d+):(\d+)(?:-(\d+))?$`)
 		match = re.FindStringSubmatch(segment)

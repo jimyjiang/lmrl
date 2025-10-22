@@ -96,6 +96,14 @@ func TestParseBibleVerses(t *testing.T) {
 				{"提后", 5, 1, 9},
 			},
 		},
+		{
+			Input: "民数记10:11-13，10:33-11:3",
+			Expected: []BibelVerse{
+				{"民", 10, 11, 13},
+				{"民", 10, 33, -1},
+				{"民", 11, 1, 3},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
