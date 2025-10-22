@@ -24,6 +24,7 @@ type SearchResult struct {
 
 func Search(c *gin.Context) {
 	q := c.Query("q")
+	q = bible.Clean(q)
 	queries := bible.ParseBibleVerses(q)
 	data := []*bible.SearchResult{}
 	if len(queries) == 0 {

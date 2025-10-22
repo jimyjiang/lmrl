@@ -17,7 +17,7 @@ func main() {
 		fmt.Println("Error loading bible data: " + err.Error())
 	}
 	argq := args[1]
-	queries := bible.ParseBibleVerses(argq)
+	queries := bible.ParseBibleVerses(bible.Clean(argq))
 	results := []*bible.SearchResult{}
 	if len(queries) == 0 {
 		results = bible.Search(data, argq)
