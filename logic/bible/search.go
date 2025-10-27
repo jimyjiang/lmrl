@@ -2,6 +2,7 @@ package bible
 
 import (
 	"fmt"
+	"github.com/samber/lo"
 	"regexp"
 	"strconv"
 	"strings"
@@ -106,6 +107,14 @@ func FullTextSearch(bible *BibleData, query string) []*SearchResult {
 		return nil
 	}
 
+	queryArr := strings.Split(query, " ")
+	queryArr = lo.Map(queryArr, func(item string, index int) string {
+		return strings.Trim(item, " ")
+	})
+	queryArr = lo.Filter(queryArr, func(item string, index int) bool {
+		return item != ""
+	})
+
 	var results []*SearchResult
 
 	// 遍历所有书卷
@@ -120,13 +129,21 @@ func FullTextSearch(bible *BibleData, query string) []*SearchResult {
 			for verseIdx, verse := range chapter.GetVerses() {
 				verseNum := verseIdx + 1
 
-				// 检查是否包含查询词
-				if strings.Contains(verse, query) {
+				if lo.EveryBy(queryArr, func(item string) bool {
+					return strings.Contains(verse, item)
+				}) {
 					results = append(results, &SearchResult{
 						Reference: fmt.Sprintf("%s%d:%d", bookAbbr, chapterNum, verseNum),
 						Text:      verse,
 					})
 				}
+				// 检查是否包含查询词
+				// if strings.Contains(verse, query) {
+				// 	results = append(results, &SearchResult{
+				// 		Reference: fmt.Sprintf("%s%d:%d", bookAbbr, chapterNum, verseNum),
+				// 		Text:      verse,
+				// 	})
+				// }
 			}
 		}
 	}
