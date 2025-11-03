@@ -24,7 +24,7 @@ export default {
 #app {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
     "Noto Sans SC", sans-serif;
-  max-width: 680px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 16px;
   text-align: left;
