@@ -9,6 +9,7 @@ import (
 	"io/fs"
 	"os"
 	"regexp"
+	"sort"
 	"strconv"
 
 	"google.golang.org/protobuf/proto"
@@ -138,7 +139,13 @@ func LoadBibleData(textFilePath string) (*Bible, error) {
 func SaveToCompressedProtobuf(bible *Bible, filePath string) error {
 	// 转换为 protobuf 结构
 	var books []*Book
+	bookAbbrevs := make([]string, 0, len(bible.Books))
 	for _, book := range bible.Books {
+		bookAbbrevs = append(bookAbbrevs, book.Abbreviation)
+	}
+	sort.Strings(bookAbbrevs)
+	for _, bookAbbrev := range bookAbbrevs {
+		book := bible.Books[bookAbbrev]
 		chapters := make([]*Chapter, 1)
 
 		// 跳过第0章（因为章节是1-based）
