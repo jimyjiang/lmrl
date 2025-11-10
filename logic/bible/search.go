@@ -71,7 +71,7 @@ func SearchByRange(bible *BibleData, bookAbbr string, chapterNum, startVerse, en
 	}
 
 	// 检查章节是否存在
-	if chapterNum <= 0 || chapterNum > len(book.GetChapters()) {
+	if chapterNum <= 0 || chapterNum >= len(book.GetChapters()) {
 		return nil
 	}
 
@@ -89,12 +89,12 @@ func SearchByRange(bible *BibleData, bookAbbr string, chapterNum, startVerse, en
 	for verseNum := startVerse; verseNum <= endVerse; verseNum++ {
 		if verseNum > 0 && verseNum <= len(verses) {
 			text := verses[verseNum-1]
-			if text != "" {
-				results = append(results, &SearchResult{
-					Reference: fmt.Sprintf("%s%d:%d", bookAbbr, chapterNum, verseNum),
-					Text:      text,
-				})
-			}
+			// if text != "" {
+			results = append(results, &SearchResult{
+				Reference: fmt.Sprintf("%s%d:%d", bookAbbr, chapterNum, verseNum),
+				Text:      text,
+			})
+			// }
 		}
 	}
 

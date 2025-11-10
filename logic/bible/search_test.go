@@ -9,15 +9,32 @@ import (
 func TestSearch(t *testing.T) {
 	bibleData, err := LoadFromCompressedProtobuf()
 	require.NoError(t, err)
+
 	bookAbbr, chapterNum, startVerse, endVerse, ok := parseReference("创1:2")
 	require.True(t, ok)
-	t.Logf("bookAbbr: %s, chapterNum: %d, startVerse: %d, endVerse: %d", bookAbbr, chapterNum, startVerse, endVerse)
-	result := Search(bibleData, "创1:2")
-	for _, r := range result {
-		t.Logf("result: %s", r.Text)
-	}
+	require.Equal(t, "创", bookAbbr)
+	require.Equal(t, 1, chapterNum)
+	require.Equal(t, 2, startVerse)
+	require.Equal(t, 2, endVerse)
+
+	result := Search(bibleData, "创1:1")
+	require.NotNil(t, result)
+	require.Equal(t, 1, len(result))
+	require.Equal(t, "创1:1", result[0].Reference)
+	require.Equal(t, "起初神创造天地。", result[0].Text)
+
 	result = Search(bibleData, "渊面黑暗")
-	for _, r := range result {
-		t.Logf("result: %s", r.Text)
-	}
+	require.NotNil(t, result)
+	require.Equal(t, 1, len(result))
+	require.Equal(t, "创1:2", result[0].Reference)
+	require.Equal(t, "地是空虚混沌。渊面黑暗。神的灵运行在水面上。", result[0].Text)
+
+	result = Search(bibleData, "来13:25")
+	require.NotNil(t, result)
+	require.Equal(t, 1, len(result))
+	require.Equal(t, "来13:25", result[0].Reference)
+	require.Equal(t, "愿恩惠常与你们众人同在。阿们。", result[0].Text)
+
+	result = Search(bibleData, "来14:12")
+	require.Nil(t, result)
 }
