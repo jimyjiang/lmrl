@@ -2,10 +2,13 @@ package bible
 
 import (
 	"fmt"
-	"github.com/samber/lo"
+	"lmrl/logic/arithmetic"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/samber/lo"
 )
 
 // SearchResult 表示搜索结果
@@ -21,8 +24,12 @@ func Search(bible *BibleData, query string) []*SearchResult {
 		return refResults
 	}
 
-	// 否则作为全文搜索
-	return FullTextSearch(bible, query)
+	// 否则作为全文精确搜索
+	if refResults := FullTextSearch(bible, query); refResults != nil {
+		return refResults
+	}
+	// 否则作为全文模糊搜索
+	return FullTextSearchByCommonSubstring(bible, query)
 }
 
 // parseReference 解析引用格式（如"约4:43"或"约4:43-54"）
@@ -144,6 +151,43 @@ func FullTextSearch(bible *BibleData, query string) []*SearchResult {
 				// 		Text:      verse,
 				// 	})
 				// }
+			}
+		}
+	}
+
+	return results
+}
+
+// FullTextSearch 全文检索
+func FullTextSearchByCommonSubstring(bible *BibleData, query string) []*SearchResult {
+	query = strings.ReplaceAll(query, " ", "")
+	if query == "" {
+		return nil
+	}
+
+	var results []*SearchResult
+
+	// 遍历所有书卷
+	for _, book := range bible.GetBooks() {
+		bookAbbr := book.GetAbbreviation()
+
+		// 遍历所有章节
+		for chapterIdx, chapter := range book.GetChapters() {
+			chapterNum := chapterIdx
+
+			// 遍历所有经文
+			for verseIdx, verse := range chapter.GetVerses() {
+				verseNum := verseIdx + 1
+
+				length := arithmetic.LongCommonSubstring(query, verse)
+				queryLength := math.Ceil(float64(len([]rune(query))) * 0.8)
+				if length >= queryLength {
+					results = append(results, &SearchResult{
+						Reference: fmt.Sprintf("%s%d:%d", bookAbbr, chapterNum, verseNum),
+						Text:      verse,
+					})
+				}
+
 			}
 		}
 	}
