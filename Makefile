@@ -32,3 +32,6 @@ restart:
 	ssh git-server "systemctl  restart lmrl"
 log:
 	ssh git-server "journalctl -u lmrl.service"
+
+genbibledata:
+	go run ./cmd/genbibledata/

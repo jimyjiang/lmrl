@@ -41,3 +41,17 @@ func LMRL(c *gin.Context) {
 		"SermonList": list,
 	})
 }
+
+func ListSermon(c *gin.Context) {
+	list, err := GetSermonsFromDir(types.MP3_DIR)
+	// list, err := GetSermonsFromDir("/Users/jimmy.jiang/doc/基督/灵命日粮/202509")
+	if err != nil {
+		c.JSON(500, gin.H{
+			"message": "Failed to retrieve sermons",
+		})
+		return
+	}
+	c.JSON(200, gin.H{
+		"list": list,
+	})
+}

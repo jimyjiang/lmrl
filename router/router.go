@@ -29,6 +29,7 @@ func Init(r *gin.Engine) {
 
 	apigroup := r.Group("/lmrl/api")
 	{
+		apigroup.GET("/sermons", api.ListSermon)
 		apigroup.GET("/search", api.Search)
 	}
 	r.GET("/lmrl/search", func(c *gin.Context) {
