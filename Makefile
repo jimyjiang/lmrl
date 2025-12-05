@@ -35,5 +35,10 @@ log:
 
 genbibledata:
 	genbibledata
+
 progress:
 	progress
+
+checkbibletxt:
+	@echo "检查是否修改到已校验过的行"
+	@git diff -- ./logic/bible/resources/bible.txt |grep '-'|grep -v '@@'|grep -v 'bible.txt' |grep -v '*' || true

@@ -45,7 +45,7 @@ func calculateCompletion(book *bible.Book) float64 {
 }
 
 // 创建进度图
-func createProgressChart(face font.Face, books []*bible.Book, completions []float64, outputPath string) error {
+func createProgressChart(face font.Face, abbrs []string, completions []float64, outputPath string) error {
 	const (
 		rows          = 11
 		cols          = 6
@@ -100,7 +100,7 @@ func createProgressChart(face font.Face, books []*bible.Book, completions []floa
 			drawRectOutline(img, x, y, cellSize, cellSize, color.RGBA{200, 200, 200, 255})
 
 			// 显示书籍缩写（假设abbreviations在另一个数组中）
-			abbr := books[index].Abbreviation // fmt.Sprintf("Book %d", index+1) // 替换为实际缩写
+			abbr := abbrs[index] // fmt.Sprintf("Book %d", index+1) // 替换为实际缩写
 			abbrX := x + (cellSize-len(abbr)*abbrFontSize/2)/2
 			abbrY := y + cellSize/2 - 10
 			drawString(face, img, abbr, abbrX, abbrY, abbrFontSize, color.RGBA{0, 0, 0, 255})
@@ -164,7 +164,7 @@ func loadChineseFont() (font.Face, error) {
 }
 
 // drawString 使用真实字体绘制文本
-func drawString(face font.Face, img *image.RGBA, text string, x, y int, fontSize int, c color.Color) {
+func drawString(face font.Face, img *image.RGBA, text string, x, y int, _ int, c color.Color) {
 	// 创建字体绘制器
 	drawer := font.Drawer{
 		Dst:  img,
@@ -203,22 +203,24 @@ func main() {
 		log.Fatalf("获取输出路径失败: %v", err)
 	}
 	// 示例数据 - 实际应用中应该从BibleData结构获取
+	bookmap := make(map[string]float64)
 	completions := make([]float64, 66)
+	abbrs := make([]string, 66)
 	data, err := bible.LoadFromCompressedProtobuf()
 	if err != nil {
 		fmt.Print("Error loading bible data: " + err.Error())
 	}
-	for idx, book := range data.Books {
-		completions[idx] = calculateCompletion(book)
+	for _, book := range data.Books {
+		bookmap[book.Abbreviation] = calculateCompletion(book)
+	}
+	for i := 0; i < 66; i++ {
+		abbr := bible.AbbrTable[i][1]
+		abbrs[i] = abbr
+		completions[i] = bookmap[abbr]
 	}
 
-	// for i := 0; i < 66; i++ {
-	// 	// 随机生成一些完成度数据用于演示
-	// 	completions[i] = math.Min(1.0, math.Max(0.0, float64(i)/100.0+0.2))
-	// }
-
 	// 创建进度图
-	if err := createProgressChart(chineseFont, data.Books, completions, outputPath); err != nil {
+	if err := createProgressChart(chineseFont, abbrs, completions, outputPath); err != nil {
 		fmt.Println("Error creating progress chart:", err)
 		return
 	}
