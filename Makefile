@@ -34,4 +34,6 @@ log:
 	ssh git-server "journalctl -u lmrl.service"
 
 genbibledata:
-	go run ./cmd/genbibledata/
+	genbibledata
+progress:
+	progress
