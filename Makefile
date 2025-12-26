@@ -42,3 +42,9 @@ progress:
 checkbibletxt:
 	@echo "检查是否修改到已校验过的行"
 	@git diff -- ./logic/bible/resources/bible.txt |grep '-'|grep -v '@@'|grep -v 'bible.txt' |grep -v '*' || true
+	@echo "查找半角的冒号"
+	@awk '{rest = $$0; sub(/^[^ ]* /, "", rest); if (rest ~ /:/) print $$0}' ./logic/bible/resources/bible.txt
+	@echo "查找半角的特殊字符"
+	@grep --color=always "[,!;.\"?']" ./logic/bible/resources/bible.txt || true
+	@echo "查找末尾的开引号"
+	@grep --color=always "“$$" ./logic/bible/resources/bible.txt || true
