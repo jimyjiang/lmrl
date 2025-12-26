@@ -45,7 +45,7 @@ checkbibletxt:
 	@echo "【查找半角的冒号，如果有，修改成全角的冒号】"
 	@awk '{rest = $$0; sub(/^[^ ]* /, "", rest); if (rest ~ /:/) print $$0}' ./logic/bible/resources/bible.txt
 	@echo "【查找半角的特殊字符，如果有，修改成全角的特殊字符】"
-	@grep --color=always "[,!;.\"?']" ./logic/bible/resources/bible.txt || true
+	@grep --color=always "[,!;.\"?'\(\)]" ./logic/bible/resources/bible.txt || true
 	@echo "【查找末尾的开引号，如果有，需要二次校验确认】"
 	@grep --color=always "“$$" ./logic/bible/resources/bible.txt || true
 		
