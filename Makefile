@@ -47,5 +47,5 @@ checkbibletxt:
 	@echo "【查找半角的特殊字符，如果有，修改成全角的特殊字符】"
 	@grep --color=always "[,!;.\"?'\(\)]" ./logic/bible/resources/bible.txt || true
 	@echo "【查找末尾的开引号，如果有，需要二次校验确认】"
-	@cat ./logic/bible/resources/bible.txt |grep -v '徒7:48' | grep --color=always "[“‘]$$"  || true
+	@cat ./logic/bible/resources/bible.txt |grep -v '徒7:48' |grep -v '徒26:1' | grep --color=always "[“‘]$$"  || true
 		
