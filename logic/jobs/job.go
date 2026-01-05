@@ -14,7 +14,6 @@ import (
 )
 
 var (
-	checkURL string
 	maxFiles = 60 // 最大保留文件数
 )
 
@@ -23,11 +22,6 @@ const (
 	fileExt    = ".mp3"   // 文件扩展名
 	timeFormat = "060102" // 年月日格式(YYMMDD)
 )
-
-func init() {
-
-	checkURL = fmt.Sprintf("https://z.lydt.work/ly/audio/%d/mw/", time.Now().Year())
-}
 
 func RegisterDownloadMp3Job() {
 	Init()
@@ -78,11 +72,17 @@ func generateFileName(t time.Time) string {
 	return fmt.Sprintf("%s%s%s", filePrefix, t.Format(timeFormat), fileExt)
 }
 
+func getCheckURL() string {
+	return fmt.Sprintf("https://x.lydt.work/storage/ly/audio/%d/mw/", time.Now().Year())
+}
+
 // downloadFile 下载文件
 func downloadFile(fileName string) error {
-	fileURL := checkURL + fileName
+	fileURL := getCheckURL() + fileName
+	fmt.Printf("HTTP请求: %v\n", fileURL)
 	resp, err := http.Get(fileURL)
 	if err != nil {
+		fmt.Printf("HTTP请求失败: %v\n", fileURL)
 		return err
 	}
 	defer resp.Body.Close()

@@ -15,14 +15,14 @@ func SetupTest() {
 }
 func TestRunDownloadMp3Job(t *testing.T) {
 	SetupTest()
-	dt, err := time.Parse(time.DateOnly, "2025-09-01")
+	dt, err := time.Parse(time.DateOnly, "2026-01-05")
 	require.NoError(t, err)
 	filename := generateFileName(dt)
-	require.EqualValues(t, "mw250901.mp3", filename)
+	require.EqualValues(t, "mw260105.mp3", filename)
 	err = RunDownloadMp3Job(dt)
 	require.NoError(t, err)
 	maxFiles = 22
-	dt, err = time.Parse(time.DateOnly, "2025-09-24")
+	dt, err = time.Parse(time.DateOnly, "2026-01-01")
 	require.NoError(t, err)
 	err = RunDownloadMp3Job(dt)
 	require.NoError(t, err)
