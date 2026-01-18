@@ -53,5 +53,7 @@ checkbibletxt:
 	grep -v '代下18:25' |\
 	grep -v '代下34:20' |\
 	grep -v '王上2:1' |\
+	grep -v '出16:11' |\
+	grep -v '出19:3' |\
 	grep --color=always "[“‘]$$"  || true
 		
