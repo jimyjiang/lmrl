@@ -57,8 +57,15 @@
             :key="index"
             class="history-item"
           >
-            <span @click="searchFromHistory(item)" class="history-text">{{ item }}</span>
-            <button @click.stop="deleteHistoryItem(index)" class="delete-history-btn">×</button>
+            <span @click="searchFromHistory(item)" class="history-text">{{
+              item
+            }}</span>
+            <button
+              @click.stop="deleteHistoryItem(index)"
+              class="delete-history-btn"
+            >
+              ×
+            </button>
           </li>
         </ul>
       </div>
@@ -187,7 +194,12 @@ export default {
       this.searchQuery = "";
       this.results = [];
       this.searched = false;
-      this.$refs.searchInput.focus();
+      if (
+        this.$refs.searchInput &&
+        typeof this.$refs.searchInput.focus === "function"
+      ) {
+        this.$refs.searchInput.focus();
+      }
     },
 
     isVerseReference(text) {
@@ -203,14 +215,19 @@ export default {
       const regex = new RegExp(query, "gi");
       return text.replace(
         regex,
-        (match) => `<span class=\"highlight\">${match}</span>`
+        (match) => `<span class=\"highlight\">${match}</span>`,
       );
     },
 
     loadHistory() {
-      const savedHistory = localStorage.getItem("bible_search_history");
-      if (savedHistory) {
-        this.history = JSON.parse(savedHistory);
+      try {
+        const savedHistory = localStorage.getItem("bible_search_history");
+        if (savedHistory) {
+          const parsed = JSON.parse(savedHistory);
+          this.history = Array.isArray(parsed) ? parsed : [];
+        }
+      } catch (e) {
+        this.history = [];
       }
     },
 
@@ -235,10 +252,12 @@ export default {
     },
 
     saveHistory() {
-      localStorage.setItem(
-        "bible_search_history",
-        JSON.stringify(this.history)
-      );
+      try {
+        localStorage.setItem(
+          "bible_search_history",
+          JSON.stringify(this.history),
+        );
+      } catch (e) {}
     },
 
     searchFromHistory(query) {
@@ -396,7 +415,8 @@ export default {
   padding-right: 20px;
   box-sizing: border-box;
   overflow-y: auto; /* Always show scrollbar if content overflows vertically */
-  height: 100%; /* Fill the height of main-content */
+  height: auto;
+  min-height: 0;
 }
 
 .history-panel h4 {
@@ -453,14 +473,14 @@ export default {
 }
 
 .results-panel {
-  flex-grow: 1; /* Allow it to grow */
-  flex-shrink: 1; /* Allow it to shrink */
-  flex-basis: 0; /* Allow it to shrink to 0 before content */
-  min-width: 0; /* Important for flex items to shrink */
+  flex: 1 1 0%;
+  min-width: 0;
   box-sizing: border-box;
-  overflow-x: hidden; /* Prevent horizontal scrollbar */
-  overflow-y: auto; /* Always show scrollbar if content overflows vertically */
-  height: 100%; /* Fill the height of main-content */
+  overflow-x: hidden;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  height: auto;
+  min-height: 0;
 }
 .results-header {
   display: flex;
@@ -489,11 +509,14 @@ export default {
   left: 0;
   width: 100vw;
   height: 100vh;
+  height: 100dvh;
+  min-height: 100vh;
   background-color: #fff;
   z-index: 1000;
   overflow-y: auto;
   padding: 20px;
   box-sizing: border-box;
+  overscroll-behavior: contain;
 }
 .results-panel.fullscreen .history-panel {
   display: none;
