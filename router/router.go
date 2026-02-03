@@ -15,7 +15,7 @@ import (
 //go:embed all:templates/*
 var templateFS embed.FS
 
-//go:embed all:frontend/*
+//go:embed all:web/*
 var embeddedFrontend embed.FS
 
 func Init(r *gin.Engine) {
@@ -23,7 +23,7 @@ func Init(r *gin.Engine) {
 	r.SetHTMLTemplate(templ)
 
 	r.GET("/lmrl/", api.LMRL)
-	assetsFS, err := fs.Sub(embeddedFrontend, "frontend/assets")
+	assetsFS, err := fs.Sub(embeddedFrontend, "web/assets")
 	fmt.Printf("err %v \n", err)
 	r.StaticFS("/lmrl/assets", http.FS(assetsFS))
 
@@ -33,7 +33,7 @@ func Init(r *gin.Engine) {
 		apigroup.GET("/search", api.Search)
 	}
 	r.GET("/lmrl/search", func(c *gin.Context) {
-		indexHTML, err := fs.ReadFile(embeddedFrontend, "frontend/index.html")
+		indexHTML, err := fs.ReadFile(embeddedFrontend, "web/index.html")
 		if err != nil {
 			c.String(500, "Failed to load index.html")
 			return

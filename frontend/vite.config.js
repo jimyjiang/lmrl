@@ -15,7 +15,7 @@ export default defineConfig({
     }
   },
   build: {
-    outDir: '../router/frontend',
+    outDir: '../router/web',
     emptyOutDir: true,
   },
   base: '/lmrl/'
