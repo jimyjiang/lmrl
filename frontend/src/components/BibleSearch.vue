@@ -41,9 +41,8 @@
       </div>
     </div>
 
-    <!-- 加载状态 -->
-    <div class="loading-indicator" v-if="loading">
-      <div class="loading-bar"></div>
+    <div class="loading-indicator">
+      <div class="loading-bar" v-show="loading"></div>
     </div>
 
     <!-- 主内容区 -->
@@ -73,9 +72,7 @@
       <!-- 结果区域 -->
       <div class="results-panel" :class="{ fullscreen: isFullScreen }">
         <div class="results-header">
-          <div class="result-stats" v-if="hasResults">
-            约 {{ results.length }} 条结果
-          </div>
+          <div class="result-stats">约 {{ results.length }} 条结果</div>
           <button @click="toggleFullScreen" class="fullscreen-button">
             <span v-if="isFullScreen">退出全屏</span>
             <span v-else>全屏显示</span>
@@ -85,41 +82,42 @@
           </button>
         </div>
 
-        <div class="search-results" v-if="hasResults">
-          <div
-            class="result-item"
-            v-for="(verse, index) in results"
-            :key="`${verse.reference}-${index}`"
-          >
-            <div class="verse-reference">
-              <a href="#" class="verse-link">{{ verse.reference }}</a
-              >&nbsp;&nbsp;
-              <span
-                class="verse-text"
-                v-html="highlightText(verse.text)"
-              ></span>
+        <div class="results-body">
+          <div class="search-results" v-show="hasResults">
+            <div
+              class="result-item"
+              v-for="(verse, index) in results"
+              :key="`${verse.reference}-${index}`"
+            >
+              <div class="verse-reference">
+                <a href="#" class="verse-link">{{ verse.reference }}</a
+                >&nbsp;&nbsp;
+                <span
+                  class="verse-text"
+                  v-html="highlightText(verse.text)"
+                ></span>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- 无结果提示 -->
-        <div class="no-results" v-if="showEmptyState">
-          <div class="no-results-icon">
-            <svg viewBox="0 0 24 24" width="48" height="48">
-              <path
-                fill="#9AA0A6"
-                d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7z"
-              />
-            </svg>
+          <div class="no-results" v-show="showEmptyState">
+            <div class="no-results-icon">
+              <svg viewBox="0 0 24 24" width="48" height="48">
+                <path
+                  fill="#9AA0A6"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.2 3.2.8-1.3-4.5-2.7z"
+                />
+              </svg>
+            </div>
+            <h3 class="no-results-title">
+              没有找到与"{{ searchQuery }}"匹配的经文
+            </h3>
+            <p class="no-results-tips">
+              建议：
+              <br />• 检查输入是否正确 <br />• 尝试其他关键词 <br />•
+              使用完整的经文引用（如"创世记1:1"）
+            </p>
           </div>
-          <h3 class="no-results-title">
-            没有找到与"{{ searchQuery }}"匹配的经文
-          </h3>
-          <p class="no-results-tips">
-            建议：
-            <br />• 检查输入是否正确 <br />• 尝试其他关键词 <br />•
-            使用完整的经文引用（如"创世记1:1"）
-          </p>
         </div>
       </div>
     </div>
@@ -477,16 +475,32 @@ export default {
   min-width: 0;
   box-sizing: border-box;
   overflow-x: hidden;
-  overflow-y: auto;
+  overflow-y: scroll;
   -webkit-overflow-scrolling: touch;
   height: auto;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 .results-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 16px;
+}
+.result-stats {
+  min-width: 120px;
+}
+.results-body {
+  position: relative;
+  min-height: 200px;
+}
+@media (min-width: 769px) {
+  .results-panel:not(.fullscreen) {
+    width: 720px;
+    max-width: 720px;
+    flex: 0 0 720px;
+  }
 }
 .fullscreen-button {
   background: none;
@@ -511,6 +525,10 @@ export default {
   height: 100vh;
   height: 100dvh;
   min-height: 100vh;
+  max-width: none;
+  right: 0;
+  bottom: 0;
+  flex: 1 1 auto;
   background-color: #fff;
   z-index: 1000;
   overflow-y: auto;
@@ -556,8 +574,14 @@ export default {
   background-color: rgba(66, 133, 244, 0.1);
 } /* 无结果 */
 .no-results {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 80px 0;
+  padding: 0;
 }
 .no-results-icon {
   margin-bottom: 24px;
