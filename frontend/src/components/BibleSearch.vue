@@ -88,6 +88,10 @@
               class="result-item"
               v-for="(verse, index) in results"
               :key="`${verse.reference}-${index}`"
+              :class="{ selected: selectedIndex === index }"
+              :data-idx="index"
+              tabindex="0"
+              @click="selectResult(index)"
             >
               <div class="verse-reference">
                 <a href="#" class="verse-link">{{ verse.reference }}</a
@@ -135,6 +139,7 @@ export default {
       searched: false,
       history: [],
       isFullScreen: false,
+      selectedIndex: null,
     };
   },
   computed: {
@@ -177,6 +182,7 @@ export default {
 
         const data = await response.json();
         this.results = data.results || [];
+        this.selectedIndex = null;
         if (this.results.length > 0) {
           this.updateHistory(queryToSearch);
         }
@@ -192,6 +198,7 @@ export default {
       this.searchQuery = "";
       this.results = [];
       this.searched = false;
+      this.selectedIndex = null;
       if (
         this.$refs.searchInput &&
         typeof this.$refs.searchInput.focus === "function"
@@ -260,11 +267,28 @@ export default {
 
     searchFromHistory(query) {
       this.searchQuery = query;
+      this.selectedIndex = null;
       this.handleSearch();
     },
 
     toggleFullScreen() {
       this.isFullScreen = !this.isFullScreen;
+    },
+    selectResult(index) {
+      this.selectedIndex = index;
+      this.scrollSelectedIntoView();
+    },
+    scrollSelectedIntoView() {
+      this.$nextTick(() => {
+        try {
+          const el = this.$el.querySelector(
+            `.result-item[data-idx="${this.selectedIndex}"]`,
+          );
+          if (el && typeof el.scrollIntoView === "function") {
+            el.scrollIntoView({ block: "nearest" });
+          }
+        } catch (e) {}
+      });
     },
 
     handleKeyDown(event) {
@@ -272,6 +296,35 @@ export default {
       if ((isMac ? event.metaKey : event.altKey) && event.key === "Enter") {
         event.preventDefault();
         this.toggleFullScreen();
+        return;
+      }
+      if (event.key === "ArrowDown") {
+        event.preventDefault();
+        const len = this.results.length;
+        if (len === 0) return;
+        if (this.selectedIndex === null || this.selectedIndex === undefined) {
+          this.selectedIndex = 0;
+        } else if (this.selectedIndex >= len - 1) {
+          this.selectedIndex = 0;
+        } else {
+          this.selectedIndex += 1;
+        }
+        this.scrollSelectedIntoView();
+        return;
+      }
+      if (event.key === "ArrowUp") {
+        event.preventDefault();
+        const len = this.results.length;
+        if (len === 0) return;
+        if (this.selectedIndex === null || this.selectedIndex === undefined) {
+          this.selectedIndex = len - 1;
+        } else if (this.selectedIndex <= 0) {
+          this.selectedIndex = len - 1;
+        } else {
+          this.selectedIndex -= 1;
+        }
+        this.scrollSelectedIntoView();
+        return;
       }
     },
   },
@@ -536,6 +589,39 @@ export default {
   box-sizing: border-box;
   overscroll-behavior: contain;
 }
+.results-panel.fullscreen .results-header {
+  margin-bottom: 24px;
+}
+.results-panel.fullscreen .search-results {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 1280px;
+  padding-top: 12px;
+}
+.results-panel.fullscreen .result-item {
+  margin-bottom: 24px;
+  max-width: 1280px;
+}
+.results-panel.fullscreen .verse-link {
+  color: #0b1a4a;
+  font-size: 36px;
+  line-height: 1.3;
+  font-weight: 600;
+}
+.results-panel.fullscreen .verse-text {
+  color: #111111;
+  line-height: 1.8;
+  font-size: 28px;
+}
+.results-panel.fullscreen .result-item.selected .verse-link,
+.results-panel.fullscreen .result-item.selected .verse-text {
+  color: #ff8c00;
+}
+.results-panel.fullscreen .highlight {
+  font-weight: 700;
+  color: #0b1a4a;
+  background-color: rgba(66, 133, 244, 0.15);
+}
 .results-panel.fullscreen .history-panel {
   display: none;
 } /* 搜索结果 */
@@ -549,6 +635,10 @@ export default {
 .result-item {
   margin-bottom: 6px;
   max-width: 600px;
+}
+.result-item.selected .verse-link,
+.result-item.selected .verse-text {
+  color: #ff8c00;
 }
 .verse-reference {
   margin-bottom: 4px;
