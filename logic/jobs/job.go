@@ -73,7 +73,8 @@ func generateFileName(t time.Time) string {
 }
 
 func getCheckURL() string {
-	return fmt.Sprintf("https://x.lydt.work/storage/ly/audio/%d/mw/", time.Now().Year())
+	// return fmt.Sprintf("https://x.lydt.work/storage/ly/audio/%d/mw/", time.Now().Year())
+	return fmt.Sprintf("https://d3ml8yyp1h3hy5.cloudfront.net/ly/audio/%d/mw/", time.Now().Year())
 }
 
 // downloadFile 下载文件
