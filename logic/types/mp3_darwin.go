@@ -16,5 +16,5 @@ func init() {
 		fmt.Println("无法获取主目录:", err)
 		return
 	}
-	MP3_DIR = filepath.Join(home, "doc/基督/灵命日粮/202510")
+	MP3_DIR = filepath.Join(home, "doc/基督/灵命日粮/202606")
 }

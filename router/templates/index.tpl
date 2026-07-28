@@ -110,24 +110,27 @@
 
     <!-- 灵修列表 -->
     <section class="bg-white rounded-xl shadow-md overflow-hidden">
-      <div class="bg-primary text-white p-4">
+      <div class="bg-primary text-white p-4 flex justify-between items-center">
         <h2 class="text-xl font-semibold flex items-center">
           <i class="fa fa-calendar-check-o mr-2"></i>灵修日程
         </h2>
+        <button id="refreshBtn" onclick="refreshSermons()" class="bg-white/20 hover:bg-white/30 text-white px-3 py-1.5 rounded-md flex items-center text-sm transition-colors">
+          <i class="fa fa-refresh mr-1"></i>刷新
+        </button>
       </div>
       
-      <div class="divide-y divide-gray-100">
+      <div id="sermonListContainer" class="divide-y divide-gray-100">
         <!-- 灵修项目 - 使用循环和条件样式 -->
       {{range .SermonList}}
       <div class="p-4 hover:bg-gray-50 transition-custom flex flex-col md:flex-row md:items-center justify-between">
         <div class="flex-1 min-w-0">
-          <a href="/灵命日粮/{{.Filename}}" class="text-primary hover:text-secondary transition-custom font-medium flex items-center">
+          <a href="/灵命日粮/{{.Filename}}" data-title="{{.Title}}" data-speaker="{{.Speaker}}" class="text-primary hover:text-secondary transition-custom font-medium flex items-center">
             <i class="fa fa-angle-right text-primary/70 mr-2"></i>
             <span class="truncate">{{.Title}}</span>
             <button onclick="copyToClipboard(event, '{{.Title}}', this)" class="ml-2 text-gray-500 hover:text-gray-700" title="复制标题">
               <i class="fa fa-copy"></i>
             </button>
-            <span id="copyFeedback" class="hidden text-sm text-green-500 ml-2">已复制!</span>
+            <span class="copyFeedback hidden text-sm text-green-500 ml-2">已复制!</span>
           </a>
           
           <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
@@ -237,33 +240,7 @@ const audioSpeaker = document.getElementById('audioSpeaker');
 let isPlaying = false;
 
 // 为所有音频链接添加点击事件
-document.querySelectorAll('a[href$=".mp3"]').forEach(link => {
-  link.addEventListener('click', function(e) {
-    e.preventDefault(); // 阻止默认跳转
-    
-    // 设置音频信息
-    const title = this.dataset.title || this.textContent.trim();
-    const speaker = this.dataset.speaker || "孙大中";
-    
-    audioTitle.textContent = title;
-    audioSpeaker.textContent = speaker;
-    
-    // 设置音频源
-    modalAudioPlayer.src = this.href;
-    
-    // 显示弹出层
-    audioPlayerModal.classList.remove('hidden');
-    audioPlayerModal.classList.add('flex');
-    
-    // 自动播放（注意：浏览器可能会阻止自动播放）
-    modalAudioPlayer.play().then(() => {
-      isPlaying = true;
-      playPauseBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
-    }).catch(error => {
-      console.log("自动播放被阻止:", error);
-    });
-  });
-});
+bindAudioLinks();
 
 // 关闭播放器
 closePlayer.addEventListener('click', () => {
@@ -391,6 +368,99 @@ function showFeedback(button) {
     const feedback = button.nextElementSibling;
     feedback.classList.remove('hidden');
     setTimeout(() => feedback.classList.add('hidden'), 2000);
+}
+
+function refreshSermons() {
+    const refreshBtn = document.getElementById('refreshBtn');
+    const icon = refreshBtn.querySelector('i');
+    
+    icon.classList.add('fa-spin');
+    refreshBtn.disabled = true;
+    
+    fetch('/lmrl/api/sermons')
+        .then(response => response.json())
+        .then(data => {
+            if (data.list && Array.isArray(data.list)) {
+                renderSermons(data.list);
+            }
+        })
+        .catch(error => {
+            console.error('刷新失败:', error);
+        })
+        .finally(() => {
+            icon.classList.remove('fa-spin');
+            refreshBtn.disabled = false;
+        });
+}
+
+function renderSermons(sermons) {
+    const container = document.getElementById('sermonListContainer');
+    container.innerHTML = '';
+    
+    sermons.forEach(sermon => {
+        const item = document.createElement('div');
+        item.className = 'p-4 hover:bg-gray-50 transition-custom flex flex-col md:flex-row md:items-center justify-between';
+        item.innerHTML = `
+            <div class="flex-1 min-w-0">
+              <a href="/灵命日粮/${sermon.Filename}" data-title="${sermon.Title}" data-speaker="${sermon.Speaker || '孙大中'}" class="text-primary hover:text-secondary transition-custom font-medium flex items-center">
+                <i class="fa fa-angle-right text-primary/70 mr-2"></i>
+                <span class="truncate">${sermon.Title}</span>
+                <button onclick="copyToClipboard(event, '${sermon.Title}', this)" class="ml-2 text-gray-500 hover:text-gray-700" title="复制标题">
+                  <i class="fa fa-copy"></i>
+                </button>
+                <span class="copyFeedback hidden text-sm text-green-500 ml-2">已复制!</span>
+              </a>
+              
+              <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-sm text-gray-600">
+                <span class="flex items-center">
+                  <i class="fa fa-user text-gray-400 mr-1"></i>${sermon.Speaker || '孙大中'}
+                </span>
+                <span class="flex items-center">
+                  <i class="fa fa-calendar text-gray-400 mr-1"></i>${sermon.Date}
+                </span>
+                <span class="flex items-center">
+                  <i class="fa fa-clock-o text-gray-400 mr-1"></i>${sermon.Duration}
+                </span>
+                <span class="flex items-center">
+                  <i class="fa fa-file-text-o text-gray-400 mr-1"></i>${sermon.FileSize}
+                </span>
+              </div>
+            </div>
+            <span class="mt-2 md:mt-0 text-gray-500 text-sm bg-gray-50 px-3 py-1 rounded-full whitespace-nowrap">${sermon.Date}</span>
+        `;
+        container.appendChild(item);
+    });
+    
+    bindAudioLinks();
+}
+
+function bindAudioLinks() {
+    document.querySelectorAll('a[href$=".mp3"]').forEach(link => {
+        link.removeEventListener('click', handleAudioLinkClick);
+        link.addEventListener('click', handleAudioLinkClick);
+    });
+}
+
+function handleAudioLinkClick(e) {
+    e.preventDefault();
+    
+    const title = this.dataset.title || this.textContent.trim();
+    const speaker = this.dataset.speaker || "孙大中";
+    
+    audioTitle.textContent = title;
+    audioSpeaker.textContent = speaker;
+    
+    modalAudioPlayer.src = this.href;
+    
+    audioPlayerModal.classList.remove('hidden');
+    audioPlayerModal.classList.add('flex');
+    
+    modalAudioPlayer.play().then(() => {
+        isPlaying = true;
+        playPauseBtn.innerHTML = '<i class="fa fa-pause text-xl"></i>';
+    }).catch(error => {
+        console.log("自动播放被阻止:", error);
+    });
 }
 </script>
 </body>
