@@ -35,9 +35,10 @@ log:
 
 genbibledata:
 	genbibledata
-
-progress:
-	progress
+	
+push:
+	git push origin
+	git push github
 
 checkbibletxt:
 	@echo "【检查是否修改到已校验过的行，如果有内容，需要二次校对确认】"
