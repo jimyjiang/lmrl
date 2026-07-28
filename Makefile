@@ -2,7 +2,7 @@ pb:
 	protoc --go_out=. --go_opt=paths=source_relative logic/bible/schema.proto
 
 fbuild:
-	cd frontend && npm install && npm run build
+	cd frontend && NODE_NO_WARNINGS=1 npm install --fund=false 2>/dev/null && NODE_NO_WARNINGS=1 npm run build
 
 build: fbuild
 	# GOOS=linux,darwin GOARCH=amd64 go build -o ./bin  ./...
